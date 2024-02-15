@@ -1,1 +1,1 @@
-This directory responsible for storing generated student result PDF files
+This directory is responsible for storing generated student result PDF files
