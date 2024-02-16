@@ -38,7 +38,7 @@ RELATION_SHIP  = (
     (OTHER, "Other"),
 )
 
-class UserManager(UserManager):
+class CustomUserManager(UserManager):
     def search(self, query=None):
         qs = self.get_queryset()
         if query is not None:
@@ -63,7 +63,7 @@ class User(AbstractUser):
 
     username_validator = ASCIIUsernameValidator()
 
-    objects = UserManager()
+    objects = CustomUserManager()
 
     @property
     def get_full_name(self):

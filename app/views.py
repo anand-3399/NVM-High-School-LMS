@@ -6,7 +6,7 @@ from django.conf import settings
 from accounts.decorators import admin_required, lecturer_required
 from .forms import SessionForm, SemesterForm, NewsAndEventsForm
 from .models import *
-
+from accounts.models import User
 
 # ########################################################
 # News & Events
@@ -287,4 +287,7 @@ def semester_delete_view(request, pk):
 @login_required
 @admin_required
 def dashboard_view(request):
-    return render(request, 'app/dashboard.html')
+    student_count = User.objects.filter(is_student=True).count()
+    lecturer_count = User.objects.filter(is_lecturer=True).count()
+    admin_count = User.objects.filter(is_superuser=True).count()
+    return render(request, 'app/dashboard.html', {'student_count': student_count, 'lecturer_count': lecturer_count, 'admin_count': admin_count})
