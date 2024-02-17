@@ -145,3 +145,7 @@ media/registration_form/*
 !media/result_sheet/
 media/result_sheet/*
 !media/result_sheet/README.txt
+
+
+# Production
+staticfiles
