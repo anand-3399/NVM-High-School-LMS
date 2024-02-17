@@ -177,7 +177,7 @@ def profile_update(request):
         request,
         "setting/profile_info_change.html",
         {
-            "title": "Setting | DjangoSMS",
+            "title": "Setting | NVM LMS",
             "form": form,
         },
     )
@@ -230,7 +230,7 @@ def staff_add_view(request):
         form = StaffAddForm()
 
     context = {
-        "title": "Lecturer Add | DjangoSMS",
+        "title": "Lecturer Add | NVM LMS",
         "form": form,
     }
 
@@ -257,7 +257,7 @@ def edit_staff(request, pk):
         request,
         "accounts/edit_lecturer.html",
         {
-            "title": "Edit Lecturer | DjangoSMS",
+            "title": "Edit Lecturer | NVM LMS",
             "form": form,
         },
     )
@@ -271,7 +271,7 @@ class LecturerListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "Lecturers | DjangoSMS"
+        context["title"] = "Lecturers | NVM LMS"
         return context
 
 
@@ -321,7 +321,7 @@ def student_add_view(request):
     return render(
         request,
         "accounts/add_student.html",
-        {"title": "Add Student | DjangoSMS", "form": form},
+        {"title": "Add Student | NVM LMS", "form": form},
     )
 
 
@@ -346,7 +346,7 @@ def edit_student(request, pk):
         request,
         "accounts/edit_student.html",
         {
-            "title": "Edit-profile | DjangoSMS",
+            "title": "Edit-profile | NVM LMS",
             "form": form,
         },
     )
@@ -366,7 +366,7 @@ class StudentListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = "Students | DjangoSMS"
+        context["title"] = "Students | NVM LMS"
         return context
 
 

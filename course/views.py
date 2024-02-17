@@ -31,7 +31,7 @@ def program_view(request):
         programs = Program.objects.filter(title__icontains=program_filter)
 
     return render(request, 'course/program_list.html', {
-        'title': "Programs | DjangoSMS",
+        'title': "Programs | NVM LMS",
         'programs': programs,
     })
 
@@ -51,7 +51,7 @@ def program_add(request):
         form = ProgramForm()
 
     return render(request, 'course/program_add.html', {
-        'title': "Add Program | DjangoSMS",
+        'title': "Add Program | NVM LMS",
         'form': form,
     })
 
@@ -88,7 +88,7 @@ def program_edit(request, pk):
         form = ProgramForm(instance=program)
 
     return render(request, 'course/program_add.html', {
-        'title': "Edit Program | DjangoSMS",
+        'title': "Edit Program | NVM LMS",
         'form': form
     })
 
@@ -144,7 +144,7 @@ def course_add(request, pk):
         form = CourseAddForm(initial={'program': Program.objects.get(pk=pk)})
 
     return render(request, 'course/course_add.html', {
-        'title': "Add Course | DjangoSMS",
+        'title': "Add Course | NVM LMS",
         'form': form, 'program': pk, 'users': users
     }, )
 
@@ -167,7 +167,7 @@ def course_edit(request, slug):
         form = CourseAddForm(instance=course)
 
     return render(request, 'course/course_add.html', {
-        'title': "Edit Course | DjangoSMS",
+        'title': "Edit Course | NVM LMS",
         # 'form': form, 'program': pk, 'course': pk
         'form': form
     }, )
@@ -218,7 +218,7 @@ class CourseAllocationFormView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = "Assign Course | DjangoSMS"
+        context['title'] = "Assign Course | NVM LMS"
         return context
 
 
@@ -226,7 +226,7 @@ class CourseAllocationFormView(CreateView):
 def course_allocation_view(request):
     allocated_courses = CourseAllocation.objects.all()
     return render(request, 'course/course_allocation_view.html', {
-        'title': "Course Allocations | DjangoSMS",
+        'title': "Course Allocations | NVM LMS",
         "allocated_courses": allocated_courses
     })
 
@@ -245,7 +245,7 @@ def edit_allocated_course(request, pk):
         form = EditCourseAllocationForm(instance=allocated)
 
     return render(request, 'course/course_allocation_form.html', {
-        'title': "Edit Course Allocated | DjangoSMS",
+        'title': "Edit Course Allocated | NVM LMS",
         'form': form, 'allocated': pk
     }, )
 
@@ -277,7 +277,7 @@ def handle_file_upload(request, slug):
     else:
         form = UploadFormFile()
     return render(request, 'upload/upload_file_form.html', {
-        'title': "File Upload | DjangoSMS",
+        'title': "File Upload | NVM LMS",
         'form': form, 'course': course
     })
 
@@ -326,7 +326,7 @@ def handle_video_upload(request, slug):
     else:
         form = UploadFormVideo()
     return render(request, 'upload/upload_video_form.html', {
-        'title': "Video Upload | DjangoSMS",
+        'title': "Video Upload | NVM LMS",
         'form': form, 'course': course
     })
 
