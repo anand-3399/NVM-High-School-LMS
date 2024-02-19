@@ -65,13 +65,17 @@
                 {% if quiz.single_attempt %}
                 <p class="p-2 bg-light-warning">{% trans "You will only get one attempt at this quiz" %}.</p>
                 {% endif %}
-                <p class="text-muted">{{ quiz.description }} here is the description of this quiz...</p>
+                <p class="text-muted">{{ quiz.description }} ...</p>
                 <!-- <p class="lead">{{ quiz.get_questions.count }} Questions</p> -->
                 <!-- <div class="row text-success mb-4">
                     <small class="col-6 text-left">{% trans "Category" %}: <b>{{ quiz.category }}</b></small>
                     <small class="col-6 text-right">Time set: <b>1:30</b></small>
                 </div> -->
                 <a class="btn btn-block btn-secondary" href="{% url 'quiz_take' pk=course.pk slug=quiz.slug %}">{% trans "Start quiz" %} &raquo;</a>
+
+                {% if request.user.is_superuser or request.user.is_lecturer %}
+                    <a class="btn btn-outline-danger br-2 mb-4" href="{% url 'quiz_delete' course.slug quiz.id %}">&minus; Delete Quiz</a>
+                {% endif %}
             </div>
         </div>
         {% if forloop.counter|divisibleby:3 %}</div><div class="row">{% endif %}

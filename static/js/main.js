@@ -82,3 +82,7 @@ function showCourses(btn) {
   }
   collapsed = !collapsed;
 }
+
+document.getElementById('popup-btn-messages').addEventListener('click', function() {
+  document.getElementById('popup-box-messages').style.display = 'none';
+});
