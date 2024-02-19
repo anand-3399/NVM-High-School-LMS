@@ -550,13 +550,13 @@ def course_registration_form(request):
     logo = settings.STATICFILES_DIRS[0] + "/img/logo.png"
     im_logo = Image(logo, 1*inch, 1*inch)
     im_logo.__setattr__("_offs_x", -250)
-    im_logo.__setattr__("_offs_y", 480)
+    im_logo.__setattr__("_offs_y", 450)
     Story.append(im_logo)
 
     picture =  settings.BASE_DIR + request.user.get_picture()
     im = Image(picture, 1.0*inch, 1.0*inch)
     im.__setattr__("_offs_x", 250)
-    im.__setattr__("_offs_y", 550)
+    im.__setattr__("_offs_y", 520)
     Story.append(im)
 
     doc.build(Story)
