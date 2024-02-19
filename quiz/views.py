@@ -67,7 +67,7 @@ class QuizUpdateView(UpdateView):
             if form.is_valid():
                 form.instance = self.object
                 form.save()
-                return redirect('quiz_index', course.slug)
+                return redirect('mc_create', slug=self.kwargs['slug'], quiz_id=form.instance.id)
         return super(QuizUpdateView, self).form_invalid(form)
 
 
