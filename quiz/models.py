@@ -60,7 +60,7 @@ class Quiz(models.Model):
     exam_paper = models.BooleanField(blank=False, default=False, verbose_name=_("Exam Paper"),
         help_text=_("If yes, the result of each attempt by a user will be stored. Necessary for marking."))
 
-    single_attempt = models.BooleanField(blank=False, default=False, verbose_name=_("Single Attempt"), 
+    single_attempt = models.BooleanField(blank=False, default=True, verbose_name=_("Single Attempt"), 
         help_text=_("If yes, only one attempt by a user will be permitted."))
 
     pass_mark = models.SmallIntegerField(blank=True, default=50, verbose_name=_("Pass Mark"), validators=[MaxValueValidator(100)], 
