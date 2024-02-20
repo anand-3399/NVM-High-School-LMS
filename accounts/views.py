@@ -14,7 +14,7 @@ from django.contrib.auth.forms import (
     PasswordChangeForm,
 )
 
-from .decorators import lecturer_required, student_required, admin_required
+from .decorators import lecturer_required, student_required, admin_required, admin_or_lecturer
 from course.models import Course
 from result.models import TakenCourse
 from app.models import Session, Semester
@@ -98,7 +98,7 @@ def profile(request):
 
 
 @login_required
-@admin_required
+@admin_or_lecturer
 def profile_single(request, id):
     """Show profile of any selected user"""
     if request.user.id == id:
