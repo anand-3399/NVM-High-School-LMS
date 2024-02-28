@@ -26,6 +26,7 @@ reportlab==4.0.4
 stripe==5.5.0
 gopay==2.0.1
 pandas==2.0.0
+openpyxl==3.1.2
 
 # Environment variable
 python-decouple==3.8
