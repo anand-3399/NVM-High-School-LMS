@@ -11,13 +11,13 @@ from .validators import ASCIIUsernameValidator
 
 
 # LEVEL_COURSE = "Level course"
-BACHLOAR_DEGREE = "SSC"
-MASTER_DEGREE = "CBSC"
+SSC = "SSC"
+CBSC = "CBSC"
 
 LEVEL = (
     # (LEVEL_COURSE, "Level course"),
-    (BACHLOAR_DEGREE, "State Board"),
-    (MASTER_DEGREE, "CBSC Board"),
+    (SSC, "State Board"),
+    (CBSC, "CBSC Board"),
 )
 
 FATHER = "Father"

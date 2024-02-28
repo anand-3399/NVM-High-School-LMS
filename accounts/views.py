@@ -21,6 +21,17 @@ from app.models import Session, Semester
 from .forms import StaffAddForm, StudentAddForm, ProfileUpdateForm, ParentAddForm
 from .models import User, Student, Parent
 
+import pandas as pd
+from django.db import connection
+import string
+import random
+from datetime import datetime
+from django.conf import settings
+from django.templatetags.static import static
+import os
+import glob
+from django.http import HttpResponseRedirect
+
 
 def validate_username(request):
     username = request.GET.get("username", None)
@@ -235,6 +246,161 @@ def staff_add_view(request):
     }
 
     return render(request, "accounts/add_staff.html", context)
+
+
+"""
+def staff_bulk_entry(request):
+    if request.method == 'POST':
+        excel_file = request.FILES['excel_file']
+        data = pd.read_excel(excel_file)
+
+        with connection.cursor() as cursor:
+            for index, row in data.iterrows():
+                # Assuming the columns in the Excel file match the columns in the table
+                columns = ', '.join(row.keys())
+                values = ', '.join(f"'{value}'" for value in row.values)
+                sql = f"INSERT INTO your_table ({columns}) VALUES ({values})"
+                cursor.execute(sql)
+
+
+        return redirect('lecturer_list')  # replace with the URL to redirect to on success
+
+    return render(request, "accounts/bulk_entry_lecturers.html")
+"""
+# Bulk Entry
+@login_required
+@admin_required
+def staff_bulk_entry(request):
+    def generate_username():
+        return ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    
+    if request.method == 'POST':
+        excel_file = request.FILES['excel_file']
+        data = pd.read_excel(excel_file)
+
+        output_data = []
+        for index, row in data.iterrows():
+            row_dict = row.to_dict()
+            row_dict['username'] = generate_username()
+            row_dict['password1'] = 'nvm-high-school-lectures'
+            row_dict['password2'] = 'nvm-high-school-lectures'
+            form = StaffAddForm(row_dict)
+            if form.is_valid():
+                form.save()
+                output_data.append(row_dict)
+            else:
+                # Handle invalid form (you might want to collect these and return them to the user)
+                pass
+        
+        output_df = pd.DataFrame(output_data)
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        output_filename = f'output_{timestamp}.xlsx'
+        # output_filepath = os.path.join(settings.STATICFILES_DIRS[0], output_filename)
+        output_filepath = os.path.join(settings.MEDIA_ROOT, 'lectures_list', output_filename)
+        output_df.to_excel(output_filepath, index=False)
+        # output_url = request.build_absolute_uri(static(output_filename))
+
+        return redirect('staff_bulk_entry')  # replace with the URL to redirect to on success
+
+    else:
+        form = StaffAddForm()
+
+    # Get a list of all Excel files in the static directory
+    # all_files = glob.glob(os.path.join(settings.STATICFILES_DIRS[0], '*.xlsx')) #correct
+    all_files = glob.glob(os.path.join(settings.MEDIA_ROOT, 'lectures_list', '*.xlsx'))
+
+    # all_excel_files = [request.build_absolute_uri(static(os.path.basename(f))) for f in all_files]
+    # all_excel_files = [(request.build_absolute_uri(static(os.path.basename(f))), os.path.basename(f)) for f in all_files]
+    # all_excel_files = [(os.path.basename(f), os.path.getmtime(f), request.build_absolute_uri(static(os.path.basename(f)))) for f in all_files]
+    # all_excel_files = [(os.path.basename(f), datetime.strptime(os.path.basename(f)[7:-5], '%Y%m%d%H%M%S'), request.build_absolute_uri(static(os.path.basename(f)))) for f in all_files]
+    # all_excel_files = [(os.path.basename(f), datetime.strptime(os.path.basename(f)[7:-5], '%Y%m%d%H%M%S'), request.build_absolute_uri(MEDIA_URL + 'lectures_list/' + os.path.basename(f))) for f in all_files]
+    # all_excel_files = [(os.path.basename(f), datetime.strptime(os.path.basename(f)[7:-5], '%Y%m%d%H%M%S'), request.build_absolute_uri(settings.MEDIA_URL + 'lectures_list' + os.path.basename(f))) for f in all_files]
+    all_excel_files = [(os.path.basename(f), datetime.strptime(os.path.basename(f)[7:-5], '%Y%m%d%H%M%S'), settings.MEDIA_URL + 'lectures_list/' + os.path.basename(f)) for f in all_files]
+
+
+    context = {
+        "title": "Bulk Entry | NVM LMS",
+        "form": form,
+        "all_excel_files": all_excel_files,
+    }
+
+    return render(request, "accounts/bulk_entry_lecturers.html", context)
+
+
+# Student BULK Entry
+# Bulk Entry
+@login_required
+@admin_required
+def student_bulk_entry(request):
+    def generate_username():
+        return ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    
+    if request.method == 'POST':
+        excel_file = request.FILES['excel_file']
+        data = pd.read_excel(excel_file)
+
+        output_data = []
+        for index, row in data.iterrows():
+            row_dict = row.to_dict()
+            row_dict['username'] = generate_username()
+            row_dict['password1'] = 'nvm-high-school-students'
+            row_dict['password2'] = 'nvm-high-school-students'
+            form = StudentAddForm(row_dict)
+            if form.is_valid():
+                form.save()
+                output_data.append(row_dict)
+            else:
+                print(form.errors,  end='\n\n\n')
+                # Handle invalid form (you might want to collect these and return them to the user)
+                pass
+        
+        output_df = pd.DataFrame(output_data)
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        output_filename = f'output_{timestamp}.xlsx'
+        # output_filepath = os.path.join(settings.STATICFILES_DIRS[0], output_filename)
+        output_filepath = os.path.join(settings.MEDIA_ROOT, 'student_list', output_filename)
+        output_df.to_excel(output_filepath, index=False)
+        # output_url = request.build_absolute_uri(static(output_filename))
+
+        return redirect('student_bulk_entry')  # replace with the URL to redirect to on success
+
+    else:
+        form = StudentAddForm()
+
+    # Get a list of all Excel files in the static directory
+    
+    all_files = glob.glob(os.path.join(settings.MEDIA_ROOT, 'student_list', '*.xlsx'))
+    all_excel_files = [(os.path.basename(f), datetime.strptime(os.path.basename(f)[7:-5], '%Y%m%d%H%M%S'), settings.MEDIA_URL + 'student_list/' + os.path.basename(f)) for f in all_files]
+
+
+    context = {
+        "title": "Bulk Entry | NVM LMS",
+        "form": form,
+        "all_excel_files_students": all_excel_files,
+    }
+
+    return render(request, "accounts/bulk_entry_students.html", context)
+
+
+@login_required
+@admin_required
+def delete_excel_file(request, filename):
+    file_path = os.path.join(settings.MEDIA_ROOT, 'lectures_list', filename)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    else:
+        print("The file does not exist")
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
+@admin_required
+def delete_excel_file_student(request, filename):
+    file_path = os.path.join(settings.MEDIA_ROOT, 'student_list', filename)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    else:
+        print("The file does not exist")
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
 @login_required

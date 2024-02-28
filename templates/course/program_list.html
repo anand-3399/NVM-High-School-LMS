@@ -63,6 +63,7 @@
             <thead>
                 <tr>
                     <th>#</th>
+                    <th>Program ID</th>
                     <th>Program Name</th>
                     <th>Summary</th>
                     {% if request.user.is_superuser %}
@@ -74,6 +75,7 @@
                 {% for program in programs %}
                 <tr>
                     <td>{{ forloop.counter }}.</td>
+                    <td>{{ program.id }}</td>
                     <td><a class="a-list" href="{{ program.get_absolute_url }}">
                             {{ program.title}}</a></td>
                     <td>{{ program.summary }} </td>

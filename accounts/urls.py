@@ -7,8 +7,8 @@ from .views import (
         profile, profile_single, admin_panel, 
         profile_update, change_password, 
         LecturerListView, StudentListView, 
-        staff_add_view, edit_staff, 
-        delete_staff, student_add_view, 
+        staff_add_view, staff_bulk_entry, delete_excel_file, delete_excel_file_student, edit_staff, 
+        delete_staff, student_add_view, student_bulk_entry, 
         edit_student, delete_student, ParentAdd, validate_username, register
     )
 from .forms import EmailValidationOnForgotPassword
@@ -26,11 +26,21 @@ urlpatterns = [
 
     path('lecturers/', LecturerListView.as_view(), name='lecturer_list'),
     path('lecturer/add/', staff_add_view, name='add_lecturer'),
+    
+    path('lecturer/add/bulkentry', staff_bulk_entry, name='staff_bulk_entry'),
+    path('delete_excel_file/<str:filename>/', delete_excel_file, name='delete_excel_file'), # of lecturers
+
+    path('delete_excel_file_student/<str:filename>/', delete_excel_file_student, name='delete_excel_file_student'), # of students
+
     path('staff/<int:pk>/edit/', edit_staff, name='staff_edit'),
     path('lecturers/<int:pk>/delete/', delete_staff, name='lecturer_delete'),
 
     path('students/', StudentListView.as_view(), name='student_list'),
     path('student/add/', student_add_view, name='add_student'),
+
+    path('student/add/bulkentry', student_bulk_entry, name='student_bulk_entry'),
+    # path('delete_excel_file/<str:filename>/', delete_excel_file, name='delete_excel_file'),
+
     path('student/<int:pk>/edit/', edit_student, name='student_edit'),
     path('students/<int:pk>/delete/', delete_student, name='student_delete'),
 

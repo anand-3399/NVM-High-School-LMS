@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock title %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+<div id="input-nav"><a href="{% url 'home' %}" class="primary1">Home</a> <i>&rsaquo;</i> 
+    <a href="{% url 'lecturer_list' %}" class="primary1">Lecturers</a> <i>&rsaquo;</i> Bulk Entry</div>
+<br>
+<div class="title-1"><i class="fas fa-chalkboard-teacher"></i>Lecturer Bulk Entry Form</div>
+<div class="title-line"></div><br>
+
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'error' %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>{{ message }}
+            </div>
+        {% else %}
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>{{ message }}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+<form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="card">
+                <p class="form-title">Bulk Entry</p>
+                <div class="p-2">
+                    <div class="form-group">
+                        <b>Upload Excel File</b>
+                        <input type="file" name="excel_file" accept=".xlsx, .xls">
+                        <span class="danger">{{ form.excel_file.errors }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <center><input class="btn btn-outline-primary" type="submit" value="Upload"></center>
+</form>
+
+<!-- % for file_url, filename in all_excel_files %}
+    <a href="{{ file_url }}"> {{ filename }}</a>
+{% endfor % -->
+<div class="table-responsive table-shadow table-light table-striped m-0 mt-5">
+
+    <table class="table  mt-3">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name of Excel file</th>
+                <th>Timestamp of Excel file</th>
+                <th>Download link</th>
+                <th> Action </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for filename, timestamp, file_url in all_excel_files %}
+            <tr>
+                <td> {{ forloop.counter }}.</td>
+                <td>{{ filename }}</td>
+                <td>{{ timestamp|date:"d M Y H:i" }}</td>
+                <td><a href="{{ file_url }}">Download</a></td>
+                <td> 
+                    <div class="update-delete">
+                        <form action="{% url 'delete_excel_file' filename=filename %}" method="POST">{% csrf_token %}
+                            <button type="submit" class="btn btn-sm" onclick="return confirm('Are you sure you want to delete this entry?');"><i class="fas fa-trash-alt"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock content %}
