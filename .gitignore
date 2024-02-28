@@ -146,6 +146,11 @@ media/registration_form/*
 media/result_sheet/*
 !media/result_sheet/README.txt
 
+!media/student_list/
+!media/lectures_list/
+
+media/student_list/*
+media/lectures_list/*
 
 # Production
 staticfiles
