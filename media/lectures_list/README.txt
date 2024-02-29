@@ -1,0 +1,1 @@
+This directory is responsible for storing the lecturer list added via the BULK Entry

@@ -147,10 +147,20 @@ media/result_sheet/*
 !media/result_sheet/README.txt
 
 !media/student_list/
-!media/lectures_list/
-
 media/student_list/*
+!media/student_list/README.txt
+
+!media/lectures_list/
 media/lectures_list/*
+!media/lectures_list/README.txt
+
+!media/course_files/
+media/course_files/*
+!media/course_files/README.txt
+
+!media/profile_pictures/
+media/profile_pictures/*
+!media/profile_pictures/README.txt
 
 # Production
 staticfiles

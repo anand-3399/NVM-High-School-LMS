@@ -1,0 +1,1 @@
+This directory is responsible for storing the student list added via the BULK Entry
