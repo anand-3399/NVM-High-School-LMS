@@ -174,8 +174,9 @@ STATICFILES_DIRS = [
 STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ["staticfiles"]))
 
 MEDIA_URL = "/media/"
-# MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ["media"]))        # Just trying to fix the media root
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media")      # This is the default media root
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media")   # Just trying to fix the media root
+# MEDIA_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ["media"]))        # Just trying to fix the media root
 
 # -----------------------------------
 # E-mail configuration
