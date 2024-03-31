@@ -61,7 +61,7 @@
                     <a href="{% url 'edit_allocated_course' pk=course.pk %}" class="update" title="Edit or Update">
                         <i class="fas fa-edit"></i>
                     </a>
-                    <a href="{% url 'course_deallocate' pk=course.pk %}" class="delete" title="Deallocate">
+                    <a href="{% url 'course_deallocate' pk=course.pk %}" class="delete" title="Deallocate" onclick="return confirm('Are you sure you want to deallocate this course?')">
                         <i class="fas fa-trash-alt"></i>
                     </a>
                     </div>

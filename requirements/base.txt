@@ -30,3 +30,7 @@ openpyxl==3.1.2
 
 # Environment variable
 python-decouple==3.8
+
+# Cloudinary
+cloudinary==1.39.0
+django-cloudinary-storage==0.3.0

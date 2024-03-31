@@ -18,8 +18,8 @@ from .decorators import lecturer_required, student_required, admin_required, adm
 from course.models import Course
 from result.models import TakenCourse
 from app.models import Session, Semester
-from .forms import StaffAddForm, StudentAddForm, ProfileUpdateForm, ParentAddForm
-from .models import User, Student, Parent
+from .forms import StaffAddForm, StudentAddForm, ProfileUpdateForm, ParentAddForm, UploadFormFileBulkEntry, UploadFormFileBulkEntryStudent
+from .models import User, Student, Parent, UploadLecturerList, UploadStudentList
 
 import pandas as pd
 from django.db import connection
@@ -31,6 +31,13 @@ from django.templatetags.static import static
 import os
 import glob
 from django.http import HttpResponseRedirect
+from django.core.files.storage import default_storage
+from cloudinary.uploader import upload
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
+# from django.conf import settings
+from cloudinary import Search
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import io
 
 
 def validate_username(request):
@@ -277,7 +284,6 @@ def staff_bulk_entry(request):
     if request.method == 'POST':
         excel_file = request.FILES['excel_file']
         data = pd.read_excel(excel_file)
-
         output_data = []
         for index, row in data.iterrows():
             row_dict = row.to_dict()
@@ -286,7 +292,7 @@ def staff_bulk_entry(request):
             row_dict['password2'] = 'nvm-high-school-lectures'
             form = StaffAddForm(row_dict)
             if form.is_valid():
-                form.save()
+                form.save()       # TO be changed when validation is done
                 output_data.append(row_dict)
             else:
                 # Handle invalid form (you might want to collect these and return them to the user)
@@ -294,29 +300,46 @@ def staff_bulk_entry(request):
         
         output_df = pd.DataFrame(output_data)
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        output_filename = f'output_{timestamp}.xlsx'
-        # output_filepath = os.path.join(settings.STATICFILES_DIRS[0], output_filename)
-        output_filepath = os.path.join(settings.MEDIA_ROOT, 'lectures_list', output_filename)
-        output_df.to_excel(output_filepath, index=False)
-        # output_url = request.build_absolute_uri(static(output_filename))
+        # Original
+        # output_filename = f'output_{timestamp}.xlsx'
+        # output_filepath = os.path.join(settings.MEDIA_ROOT, 'lectures_list', output_filename)
+        # output_df.to_excel(output_filepath, index=False)
 
+        # For cloudinary
+        output_filename = f'output_{timestamp}.xlsx'
+        
+        # Save the DataFrame to an in-memory BytesIO object
+        output_io = io.BytesIO()
+        output_df.to_excel(output_io, index=False)
+        output_io.seek(0)
+        
+        # Create a new InMemoryUploadedFile instance
+        uploaded_file = InMemoryUploadedFile(output_io, None, output_filename, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', output_io.getbuffer().nbytes, None)
+
+        request.FILES['file'] = uploaded_file
+        # print("REQUESTED FILE", request.FILES )
+
+        form = UploadFormFileBulkEntry(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+        else:
+            print(form.errors)
         return redirect('staff_bulk_entry')  # replace with the URL to redirect to on success
 
     else:
         form = StaffAddForm()
 
-    # Get a list of all Excel files in the static directory
-    # all_files = glob.glob(os.path.join(settings.STATICFILES_DIRS[0], '*.xlsx')) #correct
-    all_files = glob.glob(os.path.join(settings.MEDIA_ROOT, 'lectures_list', '*.xlsx'))
+    # ##########################
+    # Get a queryset of all UploadLecturerList instances
+    all_uploads = UploadLecturerList.objects.all()
 
-    # all_excel_files = [request.build_absolute_uri(static(os.path.basename(f))) for f in all_files]
-    # all_excel_files = [(request.build_absolute_uri(static(os.path.basename(f))), os.path.basename(f)) for f in all_files]
-    # all_excel_files = [(os.path.basename(f), os.path.getmtime(f), request.build_absolute_uri(static(os.path.basename(f)))) for f in all_files]
-    # all_excel_files = [(os.path.basename(f), datetime.strptime(os.path.basename(f)[7:-5], '%Y%m%d%H%M%S'), request.build_absolute_uri(static(os.path.basename(f)))) for f in all_files]
-    # all_excel_files = [(os.path.basename(f), datetime.strptime(os.path.basename(f)[7:-5], '%Y%m%d%H%M%S'), request.build_absolute_uri(MEDIA_URL + 'lectures_list/' + os.path.basename(f))) for f in all_files]
-    # all_excel_files = [(os.path.basename(f), datetime.strptime(os.path.basename(f)[7:-5], '%Y%m%d%H%M%S'), request.build_absolute_uri(settings.MEDIA_URL + 'lectures_list' + os.path.basename(f))) for f in all_files]
-    all_excel_files = [(os.path.basename(f), datetime.strptime(os.path.basename(f)[7:-5], '%Y%m%d%H%M%S'), settings.MEDIA_URL + 'lectures_list/' + os.path.basename(f)) for f in all_files]
-
+    # Filter the queryset to include only instances with a .xlsx or .xls file
+    all_excel_files = [(
+        upload.file.name[25:], 
+        datetime.strptime(upload.file.name[32:46], '%Y%m%d%H%M%S'), 
+        request.build_absolute_uri(upload.file.url)) 
+                   for upload in all_uploads 
+                   if upload.file.name.endswith('.xlsx') or upload.file.name.endswith('.xls')]
 
     context = {
         "title": "Bulk Entry | NVM LMS",
@@ -347,7 +370,7 @@ def student_bulk_entry(request):
             row_dict['password2'] = 'nvm-high-school-students'
             form = StudentAddForm(row_dict)
             if form.is_valid():
-                form.save()
+                form.save()   # TO be changed when validation is done
                 output_data.append(row_dict)
             else:
                 print(form.errors,  end='\n\n\n')
@@ -357,22 +380,41 @@ def student_bulk_entry(request):
         output_df = pd.DataFrame(output_data)
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         output_filename = f'output_{timestamp}.xlsx'
-        # output_filepath = os.path.join(settings.STATICFILES_DIRS[0], output_filename)
-        output_filepath = os.path.join(settings.MEDIA_ROOT, 'student_list', output_filename)
-        output_df.to_excel(output_filepath, index=False)
-        # output_url = request.build_absolute_uri(static(output_filename))
+        
+        # Save the DataFrame to an in-memory BytesIO object
+        output_io = io.BytesIO()
+        output_df.to_excel(output_io, index=False)
+        output_io.seek(0)
+        
+        # Create a new InMemoryUploadedFile instance
+        uploaded_file = InMemoryUploadedFile(output_io, None, output_filename, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', output_io.getbuffer().nbytes, None)
 
+        request.FILES['file'] = uploaded_file
+        # print("REQUESTED FILE", request.FILES )
+
+        form = UploadFormFileBulkEntryStudent(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+        else:
+            print(form.errors)
+        
         return redirect('student_bulk_entry')  # replace with the URL to redirect to on success
 
     else:
         form = StudentAddForm()
 
-    # Get a list of all Excel files in the static directory
+    # ##########################
+    # Get a queryset of all UploadStudentList instances
+    all_uploads = UploadStudentList.objects.all()
+
+    # Filter the queryset to include only instances with a .xlsx or .xls file
+    all_excel_files = [(
+        upload.file.name[24:], 
+        datetime.strptime(upload.file.name[31:45], '%Y%m%d%H%M%S'), 
+        request.build_absolute_uri(upload.file.url)) 
+                   for upload in all_uploads 
+                   if upload.file.name.endswith('.xlsx') or upload.file.name.endswith('.xls')]
     
-    all_files = glob.glob(os.path.join(settings.MEDIA_ROOT, 'student_list', '*.xlsx'))
-    all_excel_files = [(os.path.basename(f), datetime.strptime(os.path.basename(f)[7:-5], '%Y%m%d%H%M%S'), settings.MEDIA_URL + 'student_list/' + os.path.basename(f)) for f in all_files]
-
-
     context = {
         "title": "Bulk Entry | NVM LMS",
         "form": form,
@@ -385,21 +427,19 @@ def student_bulk_entry(request):
 @login_required
 @admin_required
 def delete_excel_file(request, filename):
-    file_path = os.path.join(settings.MEDIA_ROOT, 'lectures_list', filename)
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    else:
-        print("The file does not exist")
+    full_filename = (settings.MEDIA_URL + 'lectures_list/' + filename )[1:]
+    file = UploadLecturerList.objects.filter(file=full_filename)
+    if file.exists():
+        file.first().delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required
 @admin_required
 def delete_excel_file_student(request, filename):
-    file_path = os.path.join(settings.MEDIA_ROOT, 'student_list', filename)
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    else:
-        print("The file does not exist")
+    full_filename = (settings.MEDIA_URL + 'student_list/' + filename )[1:]
+    file = UploadStudentList.objects.filter(file=full_filename)
+    if file.exists():
+        file.first().delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 

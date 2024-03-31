@@ -9,6 +9,9 @@ from PIL import Image
 from course.models import Program
 from .validators import ASCIIUsernameValidator
 
+from cloudinary_storage.storage import MediaCloudinaryStorage
+from django.core.validators import FileExtensionValidator
+
 
 # LEVEL_COURSE = "Level course"
 SSC = "SSC"
@@ -58,7 +61,7 @@ class User(AbstractUser):
     is_dep_head = models.BooleanField(default=False)
     phone = models.CharField(max_length=60, blank=True, null=True)
     address = models.CharField(max_length=60, blank=True, null=True)
-    picture = models.ImageField(upload_to='profile_pictures/%y/%m/%d/', default='default.png', null=True)
+    picture = models.ImageField(upload_to='profile_pictures/%y/%m/%d/', default='default.png', null=True, storage=MediaCloudinaryStorage())
     email = models.EmailField(blank=True, null=True)
 
     username_validator = ASCIIUsernameValidator()
@@ -168,3 +171,41 @@ class DepartmentHead(models.Model):
 
     def __str__(self):
         return "{}".format(self.user)
+
+class UploadLecturerList(models.Model):
+    file = models.FileField(upload_to='lectures_list/', validators=[FileExtensionValidator(['xls', 'xlsx'])])
+    updated_date = models.DateTimeField(auto_now=True, auto_now_add=False, null=True)
+    upload_time = models.DateTimeField(auto_now=False, auto_now_add=True, null=True)
+
+    def __str__(self):
+        return str(self.file)[6:]
+
+    def get_extension_short(self):
+        ext = str(self.file).split(".")
+        ext = ext[len(ext)-1]
+
+        if ext == 'xls' or ext == 'xlsx':
+            return 'excel'
+
+    def delete(self, *args, **kwargs):
+        self.file.delete()
+        super().delete(*args, **kwargs)
+
+class UploadStudentList(models.Model):
+    file = models.FileField(upload_to='student_list/', validators=[FileExtensionValidator(['xls', 'xlsx'])])
+    updated_date = models.DateTimeField(auto_now=True, auto_now_add=False, null=True)
+    upload_time = models.DateTimeField(auto_now=False, auto_now_add=True, null=True)
+
+    def __str__(self):
+        return str(self.file)[6:]
+
+    def get_extension_short(self):
+        ext = str(self.file).split(".")
+        ext = ext[len(ext)-1]
+
+        if ext == 'xls' or ext == 'xlsx':
+            return 'excel'
+
+    def delete(self, *args, **kwargs):
+        self.file.delete()
+        super().delete(*args, **kwargs)

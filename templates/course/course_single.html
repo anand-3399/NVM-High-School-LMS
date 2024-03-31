@@ -99,7 +99,7 @@
                                         <i class="fas fa-pencil-alt"></i>
                                     </a>
                                     <a href="{% url 'upload_video_delete' slug=course.slug video_slug=video.slug %}"
-                                        class="delete" title="Delete">
+                                        class="delete" title="Delete" onclick="return confirm('Are you sure you want to delete?')">
                                         <i class="fas fa-trash-alt"></i>
                                     </a>
                                 </div>
@@ -177,7 +177,7 @@
                                         <i class="fas fa-pencil-alt"></i>
                                     </a>
                                     <a href="{% url 'upload_file_delete' slug=course.slug file_id=file.pk %}"
-                                        class="delete" title="Delete">
+                                        class="delete" title="Delete" onclick="return confirm('Are you sure you want to delete')">
                                         <i class="fas fa-trash-alt"></i>
                                     </a>
                                 </div>

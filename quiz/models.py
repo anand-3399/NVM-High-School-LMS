@@ -15,6 +15,7 @@ from django.db.models import Q
 from model_utils.managers import InheritanceManager
 from course.models import Course
 from .utils import *
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 CHOICE_ORDER_OPTIONS = (
     ('content', _('Content')),
@@ -348,7 +349,7 @@ class Sitting(models.Model):
 
 class Question(models.Model):
     quiz = models.ManyToManyField(Quiz, verbose_name=_("Quiz"), blank=True)
-    figure = models.ImageField(upload_to='uploads/%Y/%m/%d', blank=True, null=True, verbose_name=_("Figure"))
+    figure = models.ImageField(upload_to='uploads/%Y/%m/%d', blank=True, null=True, verbose_name=_("Figure"), storage=MediaCloudinaryStorage())
     content = models.CharField(max_length=1000, blank=False, 
         help_text=_("Enter the question text that you want displayed"), verbose_name=_('Question'))
     explanation = models.TextField(max_length=2000, blank=True,

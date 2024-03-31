@@ -7,6 +7,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from course.models import Program
 # from .models import User, Student, LEVEL
 from .models import *
+from .models import UploadLecturerList, UploadStudentList
 
 
 class StaffAddForm(UserCreationForm):
@@ -321,3 +322,25 @@ class ParentAddForm(UserCreationForm):
         )
         parent.save()
         return user
+
+class UploadFormFileBulkEntry(forms.ModelForm):
+    class Meta:
+        model = UploadLecturerList
+        fields = ('file',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args,**kwargs)
+        # self.fields['title'].widget.attrs.update({'class': 'form-control'})
+        self.fields['file'].widget.attrs.update({'class': 'form-control'})
+        # self.fields['file'].widget.attrs.update({'accept': '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'})
+
+class UploadFormFileBulkEntryStudent(forms.ModelForm):
+    class Meta:
+        model = UploadStudentList
+        fields = ('file',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args,**kwargs)
+        # self.fields['title'].widget.attrs.update({'class': 'form-control'})
+        self.fields['file'].widget.attrs.update({'class': 'form-control'})
+        # self.fields['file'].widget.attrs.update({'accept': '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'})

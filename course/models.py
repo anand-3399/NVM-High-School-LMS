@@ -6,6 +6,8 @@ from django.db.models.signals import pre_save
 from django.db.models import Q
 from datetime import date
 
+from cloudinary_storage.storage import VideoMediaCloudinaryStorage
+# from cloudinary_storage.validators import validate_video
 
 # project import
 from .utils import *
@@ -159,7 +161,8 @@ class UploadVideo(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField(blank=True, unique=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    video = models.FileField(upload_to='course_videos/', validators=[FileExtensionValidator(['mp4', 'mkv', 'wmv', '3gp', 'f4v', 'avi', 'mp3'])])
+    video = models.FileField(upload_to='course_videos/', validators=[FileExtensionValidator(['mp4', 'mkv', 'wmv', '3gp', 'avi', 'mp3', 'mpeg'])], storage=VideoMediaCloudinaryStorage())      # Original
+    # video = models.FileField(upload_to='course_videos/', validators=[validate_video], storage=VideoMediaCloudinaryStorage())
     summary = models.TextField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True, null=True)
 
