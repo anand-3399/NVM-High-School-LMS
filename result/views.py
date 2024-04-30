@@ -553,7 +553,7 @@ def course_registration_form(request):
     im_logo.__setattr__("_offs_y", 450)
     Story.append(im_logo)
 
-    picture =  settings.BASE_DIR + request.user.get_picture()
+    picture = request.user.get_picture()
     im = Image(picture, 1.0*inch, 1.0*inch)
     im.__setattr__("_offs_x", 250)
     im.__setattr__("_offs_y", 520)
